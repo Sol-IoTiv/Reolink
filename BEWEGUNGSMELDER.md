@@ -24,7 +24,7 @@ Die vorhandenen Variablen der eigenen Kamera können direkt ausgewählt werden. 
 ## Verhalten
 
 - Eine positive Erkennung schaltet bei ausreichender Dunkelheit ein.
-- Jede weitere positive Erkennung verlängert die Nachlaufzeit, auch wenn das eingeschaltete Licht den Helligkeitssensor aufhellt.
+- Nur weitere positive Erkennungen unterhalb des Lux-Schwellwerts verlängern die Nachlaufzeit.
 - Bei der eigenen Kamera werden Webhook-Erkennungen und alle positiven Polling-Antworten berücksichtigt, auch ohne Änderung des Boolean-Wertes.
 - Die Erkennungsarten Mensch, Tier und Fahrzeug lassen sich einzeln ein- und ausschalten; ihre Kamera-Variablen werden automatisch gefunden.
 - Negative Erkennungen und die bestehenden 5-Sekunden-Rücksetzungen schalten das Ziel nicht aus und verlängern die Nachlaufzeit nicht.
@@ -44,7 +44,7 @@ Schalten erfolgt über Symcons `RequestAction`, damit die hinterlegte Geräteakt
 
 ## Prüfung
 
-PHP 8.3.31: Syntaxprüfung beider Moduldateien bestanden. 49 automatisierte Prüfungen mit simulierten Symcon-Funktionen bestanden, einschließlich Webhook und Polling im tatsächlichen Modul, Nachtriggern, Schwellenwert, unverändertem 5-Sekunden-Reset, Erkennungskombinationen und Zielwechsel, Neustart und Aktionsfehlern.
+PHP 8.3.31: Syntaxprüfung beider Moduldateien bestanden. 85 automatisierte Prüfungen mit simulierten Symcon-Funktionen bestanden, einschließlich Webhook und Polling im tatsächlichen Modul, Nachtriggern, Schwellenwert, unverändertem 5-Sekunden-Reset, Erkennungskombinationen und Zielwechsel, Neustart und Aktionsfehlern.
 
 Ausführen mit PHP 8.2 oder neuer:
 
@@ -59,7 +59,7 @@ Ein Live-Test mit Symcon und Kamera steht aus. Dafür zunächst eine Test-Schalt
 
 ## Statusanzeige
 
-Die Boolean-Variable **Bewegungsmelder aktiv** ist eine reine Anzeige ohne Schaltaktion. Sie ist An, wenn der Hauptschalter und mindestens eine Erkennungsart eingeschaltet sind. Sie zeigt die gespeicherte Auswahl nach Änderungen übernehmen; keine Bewegung, keinen Lichtzustand und keine Prüfung der Betriebsbereitschaft. 81 automatisierte Prüfungen mit simulierten Symcon-Funktionen bestanden, einschließlich aller Schalterkombinationen.
+Die Boolean-Variable **Bewegungsmelder aktiv** ist eine reine Anzeige ohne Schaltaktion. Sie ist An, wenn der Hauptschalter und mindestens eine Erkennungsart eingeschaltet sind. Sie zeigt die gespeicherte Auswahl nach Änderungen übernehmen; keine Bewegung, keinen Lichtzustand und keine Prüfung der Betriebsbereitschaft. 85 automatisierte Prüfungen mit simulierten Symcon-Funktionen bestanden, einschließlich aller Schalterkombinationen.
 
 
 ## Hauptschalter der Lichtsteuerung
@@ -83,6 +83,11 @@ Das Einfahrtslicht soll bei Menschen oder Fahrzeugen einschalten, aber nicht bei
 | Einschalten unter Schwellwert | 30 lux, als anpassbarer Startwert |
 | Nachlaufzeit | 120 Sekunden |
 
-Unter 30 lux schaltet eine erkannte Person oder ein erkanntes Fahrzeug das zuvor ausgeschaltete Einfahrtslicht ein. Jede weitere passende Erkennung startet die Nachlaufzeit erneut. Nach 120 Sekunden ohne weitere passende Erkennung sendet die Automatik false an die Schaltaktion.
+Unter 30 lux schaltet eine erkannte Person oder ein erkanntes Fahrzeug das zuvor ausgeschaltete Einfahrtslicht ein. Jede weitere passende Erkennung unterhalb des Lux-Schwellwerts startet die Nachlaufzeit erneut. Nach 120 Sekunden ohne weitere passende Erkennung sendet die Automatik false an die Schaltaktion.
 
 Eine ausschließlich als Tier gemeldete Erkennung schaltet nicht ein und verlängert die Nachlaufzeit nicht. Die Tier-Erkennungsvariable der Kamera funktioniert trotzdem weiter. Die Unterscheidung hängt von der Klassifizierung der Kamera ab: Fehlklassifizierungen sind möglich; werden gleichzeitig eine Person oder ein Fahrzeug erkannt, darf das Licht einschalten. Es ist daher keine Garantie, dass Katzen oder Hunde unter allen Umständen ausgeschlossen werden.
+
+
+## Helligkeit während der Nachlaufzeit (ab Testversion 0.6)
+
+Der Lux-Schwellwert gilt sowohl zum Einschalten als auch zum Verlängern. Beispiel: Bei 20 lux wird eingeschaltet. Steigt die Helligkeit auf mindestens 30 lux, verlängern neue Erkennungen die laufende Nachlaufzeit nicht mehr. Das Licht geht nach Ablauf der Zeit seit der letzten passenden Erkennung unterhalb von 30 lux aus – auch bei fortlaufender Personen- oder Fahrzeugerkennung. Die Lux-Überschreitung startet keine neue Frist und schaltet nicht sofort aus. Erst unterhalb von 30 lux dürfen passende Erkennungen wieder einschalten oder verlängern. Dies gilt auch, wenn das eingeschaltete Licht selbst den Sensor aufhellt.
