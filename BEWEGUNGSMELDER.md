@@ -13,7 +13,7 @@ Diese Erweiterung ist für das bestehende Reolink-Modul bestimmt. Für den paral
 | Feld | Bedeutung |
 | --- | --- |
 | Zusätzlichen Bewegungsmelder aktivieren | Standardmäßig aus; aktiviert nur die neue Lichtsteuerung. |
-| Mensch, Tier, Fahrzeug | Je eine Boolean-Erkennungsvariable; mindestens eine auswählen. Leere Felder bleiben unberücksichtigt. |
+| Mensch, Tier, Fahrzeug | Ein-/Aus-Schalter; die jeweiligen Variablen dieser Kamera werden automatisch gefunden. Jede Kombination ist möglich. |
 | Schaltvariable | Boolean-Variable mit Standardaktion oder eigenem Aktionsskript. `true` schaltet ein, `false` aus. |
 | Helligkeitsvariable | Integer- oder Float-Variable des Helligkeitssensors. |
 | Einschalten unter Schwellwert | Nur Werte **kleiner** als dieser Wert erlauben Einschalten. Einheit entspricht dem Sensor, zum Beispiel Lux. Standard: 30. |
@@ -26,7 +26,7 @@ Die vorhandenen Variablen der eigenen Kamera können direkt ausgewählt werden. 
 - Eine positive Erkennung schaltet bei ausreichender Dunkelheit ein.
 - Jede weitere positive Erkennung verlängert die Nachlaufzeit, auch wenn das eingeschaltete Licht den Helligkeitssensor aufhellt.
 - Bei der eigenen Kamera werden Webhook-Erkennungen und alle positiven Polling-Antworten berücksichtigt, auch ohne Änderung des Boolean-Wertes.
-- Externe Erkennungsvariablen werden über `VM_UPDATE` überwacht. Auch wiederholte `true`-Aktualisierungen zählen. Ein dauerhaftes `true` ohne weitere Aktualisierungen gilt nicht als neue Erkennung.
+- Die Erkennungsarten Mensch, Tier und Fahrzeug lassen sich einzeln ein- und ausschalten; ihre Kamera-Variablen werden automatisch gefunden.
 - Negative Erkennungen und die bestehenden 5-Sekunden-Rücksetzungen schalten das Ziel nicht aus und verlängern die Nachlaufzeit nicht.
 - Der eigene Timer prüft die Frist jede Sekunde. Das Ausschalten erfolgt bei der nächsten Ausführung nach Fristablauf; Symcon-Auslastung kann dies verzögern.
 - Helligkeitsänderungen allein schalten nicht ein; es ist eine neue Erkennung erforderlich.
@@ -44,7 +44,7 @@ Schalten erfolgt über Symcons `RequestAction`, damit die hinterlegte Geräteakt
 
 ## Prüfung
 
-PHP 8.3.31: Syntaxprüfung beider Moduldateien bestanden. 27 automatisierte Prüfungen mit simulierten Symcon-Funktionen bestanden, einschließlich Webhook und Polling im tatsächlichen Modul, Nachtriggern, Schwellenwert, unverändertem 5-Sekunden-Reset, Quellen- und Zielwechsel, Neustart und Aktionsfehlern.
+PHP 8.3.31: Syntaxprüfung beider Moduldateien bestanden. 49 automatisierte Prüfungen mit simulierten Symcon-Funktionen bestanden, einschließlich Webhook und Polling im tatsächlichen Modul, Nachtriggern, Schwellenwert, unverändertem 5-Sekunden-Reset, Erkennungskombinationen und Zielwechsel, Neustart und Aktionsfehlern.
 
 Ausführen mit PHP 8.2 oder neuer:
 

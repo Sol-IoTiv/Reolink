@@ -6,8 +6,11 @@ trait ReolinkMotionLighting
     private function CreateMotionLighting(): void
     {
         $this->RegisterPropertyBoolean('MotionLightEnabled', false);
-        foreach (['Person', 'Animal', 'Vehicle', 'Target', 'Brightness'] as $name) {
+        foreach (['Target', 'Brightness'] as $name) {
             $this->RegisterPropertyInteger('MotionLight' . $name, 0);
+        }
+        foreach (['Person', 'Animal', 'Vehicle'] as $name) {
+            $this->RegisterPropertyBoolean('MotionLightUse' . $name, false);
         }
         $this->RegisterPropertyFloat('MotionLightThreshold', 30.0);
         $this->RegisterPropertyInteger('MotionLightDelay', 120);
@@ -24,14 +27,14 @@ trait ReolinkMotionLighting
             'type' => 'ExpansionPanel', 'caption' => 'Bewegungsmelder / Lichtsteuerung',
             'items' => [
                 ['type' => 'CheckBox', 'name' => 'MotionLightEnabled', 'caption' => 'Zusätzlichen Bewegungsmelder aktivieren'],
-                ['type' => 'SelectVariable', 'name' => 'MotionLightPerson', 'caption' => 'Mensch – Erkennungsvariable (Boolean)'],
-                ['type' => 'SelectVariable', 'name' => 'MotionLightAnimal', 'caption' => 'Tier – Erkennungsvariable (Boolean)'],
-                ['type' => 'SelectVariable', 'name' => 'MotionLightVehicle', 'caption' => 'Fahrzeug – Erkennungsvariable (Boolean)'],
+                ['type' => 'CheckBox', 'name' => 'MotionLightUsePerson', 'caption' => 'Mensch als Auslöser verwenden'],
+                ['type' => 'CheckBox', 'name' => 'MotionLightUseAnimal', 'caption' => 'Tier als Auslöser verwenden'],
+                ['type' => 'CheckBox', 'name' => 'MotionLightUseVehicle', 'caption' => 'Fahrzeug als Auslöser verwenden'],
                 ['type' => 'SelectVariable', 'name' => 'MotionLightTarget', 'caption' => 'Schaltvariable (Boolean mit Aktion)'],
                 ['type' => 'SelectVariable', 'name' => 'MotionLightBrightness', 'caption' => 'Helligkeitsvariable (Integer oder Float)'],
                 ['type' => 'NumberSpinner', 'name' => 'MotionLightThreshold', 'caption' => 'Einschalten unter Schwellwert', 'digits' => 2],
                 ['type' => 'NumberSpinner', 'name' => 'MotionLightDelay', 'caption' => 'Nachlaufzeit ab letzter Erkennung', 'suffix' => ' Sekunden', 'minimum' => 1, 'maximum' => 86400],
-                ['type' => 'Label', 'caption' => 'Mindestens eine Erkennungsvariable wählen. Leere Felder werden ignoriert. Schwellwert in der Einheit des Helligkeitssensors.'],
+                ['type' => 'Label', 'caption' => 'Erkennungsarten beliebig kombinieren. Die eigenen Kamera-Variablen werden automatisch verwendet. Schwellwert in der Einheit des Helligkeitssensors.'],
                 ['type' => 'Label', 'caption' => 'Jede erneute Erkennung verlängert die Nachlaufzeit. Die bestehenden 5-Sekunden-Timer bleiben unverändert.'],
                 ['type' => 'Label', 'caption' => 'Bereits eingeschaltete Ziele werden nicht übernommen. Beim Deaktivieren wird ein durch diese Automatik eingeschaltetes Ziel ausgeschaltet.'],
                 ['type' => 'Label', 'caption' => 'Konfiguration: ' . ($this->MotionLightingError() ?? 'gültig')],
@@ -41,18 +44,20 @@ trait ReolinkMotionLighting
 
     private function MotionLightingSources(): array
     {
-        return array_values(array_unique(array_filter([
-            $this->ReadPropertyInteger('MotionLightPerson'),
-            $this->ReadPropertyInteger('MotionLightAnimal'),
-            $this->ReadPropertyInteger('MotionLightVehicle'),
-        ], static fn(int $id): bool => $id > 0)));
+        $sources = [];
+        foreach (['Person' => 'Person', 'Animal' => 'Tier', 'Vehicle' => 'Fahrzeug'] as $name => $ident) {
+            if (!$this->ReadPropertyBoolean('MotionLightUse' . $name)) continue;
+            $id = @$this->GetIDForIdent($ident);
+            if ($id !== false && $id > 0) $sources[] = $id;
+        }
+        return $sources;
     }
 
     private function MotionLightingError(): ?string
     {
         if (!$this->ReadPropertyBoolean('MotionLightEnabled')) return null;
         $sources = $this->MotionLightingSources();
-        if (!$sources) return 'Mindestens eine Erkennungsvariable auswählen.';
+        if (!$sources) return 'Mindestens eine Erkennungsart einschalten und Bewegungsvariablen der Kamera aktivieren.';
         foreach ($sources as $id) {
             if (!IPS_VariableExists($id) || IPS_GetVariable($id)['VariableType'] !== 0) {
                 return 'Erkennungsvariablen müssen vorhandene Boolean-Variablen sein.';
