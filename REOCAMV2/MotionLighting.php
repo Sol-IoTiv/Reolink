@@ -149,13 +149,14 @@ trait ReolinkV2MotionLighting
             $owned = $this->ReadAttributeInteger('MotionLightOwnedTarget');
             // Finish an old target before acquiring a newly configured target.
             if ($owned !== 0 && $owned !== $target && !$this->MotionLightingRelease()) return;
+            // Brightness gates both starting and extending the follow-up time.
+            $brightness = (float)GetValue($this->ReadPropertyInteger('MotionLightBrightness'));
+            if (!is_finite($brightness) || $brightness >= $this->ReadPropertyFloat('MotionLightThreshold')) return;
             if ($this->ReadAttributeInteger('MotionLightOwnedTarget') === $target) {
                 $this->WriteAttributeInteger('MotionLightLastDetection', time());
                 $this->SetTimerInterval('MotionLightTimer', 1000);
                 return;
             }
-            $brightness = (float)GetValue($this->ReadPropertyInteger('MotionLightBrightness'));
-            if (!is_finite($brightness) || $brightness >= $this->ReadPropertyFloat('MotionLightThreshold')) return;
             if (GetValue($target) === true) return; // Do not switch off a pre-existing manual light.
             if (!$this->MotionLightingSwitch($target, true)) return;
             $this->WriteAttributeInteger('MotionLightOwnedTarget', $target);

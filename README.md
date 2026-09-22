@@ -2,7 +2,7 @@
 
 Separate Testversion auf Basis von [mb-stern/Reolink](https://github.com/mb-stern/Reolink), Branch `beta`, Commit `4c5df91d79930c873a2019161ac3eff80ffc7993`. Original von Stefan Künzli, MIT-Lizenz unverändert enthalten. Dies ist keine offizielle neue Version des Store-Moduls.
 
-Zusätzlich zur Kameraerkennung gibt es eine konfigurierbare Lichtsteuerung: Ein-/Aus-Schalter für Mensch, Tier und Fahrzeug (eigene Kamera-Variablen automatisch), eine Boolean-Schaltvariable mit Aktion, eine numerische Helligkeitsvariable, Schwellwert und Nachlaufzeit ab letzter Erkennung. Die bisherigen 5-Sekunden-Reset-Timer bleiben unverändert. Jede positive Erkennung verlängert den zusätzlichen Timer; bei laufendem Licht wird die Helligkeit nicht erneut als Sperre ausgewertet.
+Zusätzlich zur Kameraerkennung gibt es eine konfigurierbare Lichtsteuerung: Ein-/Aus-Schalter für Mensch, Tier und Fahrzeug (eigene Kamera-Variablen automatisch), eine Boolean-Schaltvariable mit Aktion, eine numerische Helligkeitsvariable, Schwellwert und Nachlaufzeit ab letzter Erkennung. Die bisherigen 5-Sekunden-Reset-Timer bleiben unverändert. Jede positive Erkennung unterhalb des Lux-Schwellwerts verlängert den zusätzlichen Timer; auch bei laufendem Licht wird die Helligkeit vor jeder Verlängerung geprüft.
 
 ## Parallel zum Store-Modul installieren
 
@@ -48,7 +48,7 @@ Nach erfolgreichem Test soll ausschließlich die Bewegungsmelder-Erweiterung geg
 
 ## Statusanzeige
 
-Die Boolean-Variable **Bewegungsmelder aktiv** ist eine reine Anzeige ohne Schaltaktion. Sie ist An, wenn der Hauptschalter und mindestens eine Erkennungsart eingeschaltet sind. Sie zeigt die gespeicherte Auswahl nach Änderungen übernehmen; keine Bewegung, keinen Lichtzustand und keine Prüfung der Betriebsbereitschaft. 81 automatisierte Prüfungen mit simulierten Symcon-Funktionen bestanden, einschließlich aller Schalterkombinationen.
+Die Boolean-Variable **Bewegungsmelder aktiv** ist eine reine Anzeige ohne Schaltaktion. Sie ist An, wenn der Hauptschalter und mindestens eine Erkennungsart eingeschaltet sind. Sie zeigt die gespeicherte Auswahl nach Änderungen übernehmen; keine Bewegung, keinen Lichtzustand und keine Prüfung der Betriebsbereitschaft. 85 automatisierte Prüfungen mit simulierten Symcon-Funktionen bestanden, einschließlich aller Schalterkombinationen.
 
 
 ## Hauptschalter der Lichtsteuerung
@@ -72,6 +72,11 @@ Das Einfahrtslicht soll bei Menschen oder Fahrzeugen einschalten, aber nicht bei
 | Einschalten unter Schwellwert | 30 lux, als anpassbarer Startwert |
 | Nachlaufzeit | 120 Sekunden |
 
-Unter 30 lux schaltet eine erkannte Person oder ein erkanntes Fahrzeug das zuvor ausgeschaltete Einfahrtslicht ein. Jede weitere passende Erkennung startet die Nachlaufzeit erneut. Nach 120 Sekunden ohne weitere passende Erkennung sendet die Automatik false an die Schaltaktion.
+Unter 30 lux schaltet eine erkannte Person oder ein erkanntes Fahrzeug das zuvor ausgeschaltete Einfahrtslicht ein. Jede weitere passende Erkennung unterhalb des Lux-Schwellwerts startet die Nachlaufzeit erneut. Nach 120 Sekunden ohne weitere passende Erkennung sendet die Automatik false an die Schaltaktion.
 
 Eine ausschließlich als Tier gemeldete Erkennung schaltet nicht ein und verlängert die Nachlaufzeit nicht. Die Tier-Erkennungsvariable der Kamera funktioniert trotzdem weiter. Die Unterscheidung hängt von der Klassifizierung der Kamera ab: Fehlklassifizierungen sind möglich; werden gleichzeitig eine Person oder ein Fahrzeug erkannt, darf das Licht einschalten. Es ist daher keine Garantie, dass Katzen oder Hunde unter allen Umständen ausgeschlossen werden.
+
+
+## Helligkeit während der Nachlaufzeit (ab Testversion 0.6)
+
+Der Lux-Schwellwert gilt sowohl zum Einschalten als auch zum Verlängern. Beispiel: Bei 20 lux wird eingeschaltet. Steigt die Helligkeit auf mindestens 30 lux, verlängern neue Erkennungen die laufende Nachlaufzeit nicht mehr. Das Licht geht nach Ablauf der Zeit seit der letzten passenden Erkennung unterhalb von 30 lux aus – auch bei fortlaufender Personen- oder Fahrzeugerkennung. Die Lux-Überschreitung startet keine neue Frist und schaltet nicht sofort aus. Erst unterhalb von 30 lux dürfen passende Erkennungen wieder einschalten oder verlängern. Dies gilt auch, wenn das eingeschaltete Licht selbst den Sensor aufhellt.
