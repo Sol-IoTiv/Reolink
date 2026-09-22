@@ -60,3 +60,29 @@ Ein Live-Test mit Symcon und Kamera steht aus. Dafür zunächst eine Test-Schalt
 ## Statusanzeige
 
 Die Boolean-Variable **Bewegungsmelder aktiv** ist eine reine Anzeige ohne Schaltaktion. Sie ist An, wenn der Hauptschalter und mindestens eine Erkennungsart eingeschaltet sind. Sie zeigt die gespeicherte Auswahl nach Änderungen übernehmen; keine Bewegung, keinen Lichtzustand und keine Prüfung der Betriebsbereitschaft. 81 automatisierte Prüfungen mit simulierten Symcon-Funktionen bestanden, einschließlich aller Schalterkombinationen.
+
+
+## Hauptschalter der Lichtsteuerung
+
+**„Zusätzlichen Bewegungsmelder aktivieren“ ist der Hauptschalter.** Nur wenn dieser eingeschaltet ist, darf die neue Automatik das Licht schalten. Die Schalter Mensch, Tier und Fahrzeug legen zusätzlich fest, welche Erkennungsarten auslösen dürfen. Nach dem Einstellen **Änderungen übernehmen**.
+
+Ist der Hauptschalter aus, bleiben die normale Kamera-Erkennung und die bisherigen Erkennungsvariablen aktiv; die zusätzliche Lichtsteuerung ist ausgeschaltet. Die Statusvariable „Bewegungsmelder aktiv“ zeigt An, wenn der Hauptschalter und mindestens eine Erkennungsart eingeschaltet sind. Sie zeigt die Aktivierung, nicht den aktuellen Lichtzustand.
+
+## Beispiel: smarter Bewegungsmelder für die Hauseinfahrt
+
+Das Einfahrtslicht soll bei Menschen oder Fahrzeugen einschalten, aber nicht bei einer als Tier erkannten Katze oder einem Hund.
+
+| Einstellung | Beispiel |
+| --- | --- |
+| Zusätzlichen Bewegungsmelder aktivieren | An |
+| Mensch als Auslöser verwenden | An |
+| Tier als Auslöser verwenden | Aus |
+| Fahrzeug als Auslöser verwenden | An |
+| Schaltvariable | Einfahrtslicht: Boolean-Variable mit Geräteaktion |
+| Helligkeitsvariable | Außen-Helligkeitssensor in lux |
+| Einschalten unter Schwellwert | 30 lux, als anpassbarer Startwert |
+| Nachlaufzeit | 120 Sekunden |
+
+Unter 30 lux schaltet eine erkannte Person oder ein erkanntes Fahrzeug das zuvor ausgeschaltete Einfahrtslicht ein. Jede weitere passende Erkennung startet die Nachlaufzeit erneut. Nach 120 Sekunden ohne weitere passende Erkennung sendet die Automatik false an die Schaltaktion.
+
+Eine ausschließlich als Tier gemeldete Erkennung schaltet nicht ein und verlängert die Nachlaufzeit nicht. Die Tier-Erkennungsvariable der Kamera funktioniert trotzdem weiter. Die Unterscheidung hängt von der Klassifizierung der Kamera ab: Fehlklassifizierungen sind möglich; werden gleichzeitig eine Person oder ein Fahrzeug erkannt, darf das Licht einschalten. Es ist daher keine Garantie, dass Katzen oder Hunde unter allen Umständen ausgeschlossen werden.
