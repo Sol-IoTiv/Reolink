@@ -623,7 +623,6 @@ class ReolinkV2 extends IPSModuleStrict
 
         $form = [
            'elements' => [
-                $this->MotionLightingForm(),
                 [
                     'type'  => 'RowLayout',
                     'items' => [
@@ -757,6 +756,7 @@ class ReolinkV2 extends IPSModuleStrict
                         ],
                     ],
                 ],
+                $this->MotionLightingForm(),
             ],
 
                 'actions' => [
