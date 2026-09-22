@@ -1,0 +1,14 @@
+{
+    "id": "{65908CBB-6DB7-47DD-9422-FAC701FC0153}",
+    "name": "ReolinkV2",
+    "type": 3,
+    "vendor": "",
+    "aliases": [
+        "Reolink V2 (Test)"
+    ],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "REOCAMV2",
+    "url": "https://github.com/Sol-IoTiv/Reolink"
+}

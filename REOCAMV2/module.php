@@ -2,9 +2,9 @@
 
 require_once __DIR__ . '/MotionLighting.php';
 
-class Reolink extends IPSModuleStrict
+class ReolinkV2 extends IPSModuleStrict
 {
-    use ReolinkMotionLighting;
+    use ReolinkV2MotionLighting;
     /**
      * Zentrale API-Definitionen.
      * versioned=true: V20/Legacy wird über apiProbe() erkannt.
@@ -318,21 +318,21 @@ class Reolink extends IPSModuleStrict
         $this->RegisterAttributeString('MdAlarmScopeBackup', '');
 
         // Hook-Adresse (ohne /hook/)
-        $address = 'reolink_' . $this->InstanceID;   
+        $address = 'reolink_v2_' . $this->InstanceID;   
         $this->RegisterHook($address);
         $this->WriteAttributeString('CurrentHook', '/hook/' . $address);
 
         // Timer
-        $this->RegisterTimer("Person_Reset",   0, 'REOCAM_ResetMoveTimer($_IPS[\'TARGET\'], "Person");');
-        $this->RegisterTimer("Tier_Reset",     0, 'REOCAM_ResetMoveTimer($_IPS[\'TARGET\'], "Tier");');
-        $this->RegisterTimer("Fahrzeug_Reset", 0, 'REOCAM_ResetMoveTimer($_IPS[\'TARGET\'], "Fahrzeug");');
-        $this->RegisterTimer("Bewegung_Reset", 0, 'REOCAM_ResetMoveTimer($_IPS[\'TARGET\'], "Bewegung");');
-        $this->RegisterTimer("Test_Reset",     0, 'REOCAM_ResetMoveTimer($_IPS[\'TARGET\'], "Test");');
-        $this->RegisterTimer("Besucher_Reset", 0, 'REOCAM_ResetMoveTimer($_IPS[\'TARGET\'], "Besucher");');
-        $this->RegisterTimer("PollingTimer",      0, 'REOCAM_Polling($_IPS[\'TARGET\']);');
-        $this->RegisterTimer("ApiRequestTimer",   0, 'REOCAM_ExecuteApiRequests($_IPS[\'TARGET\'], false);');
-        $this->RegisterTimer("TokenRenewalTimer", 0, 'REOCAM_GetToken($_IPS[\'TARGET\']);');
-        $this->RegisterTimer("FirmwareCheckTimer", 0, 'REOCAM_FirmwareCheckTimer($_IPS[\'TARGET\']);');
+        $this->RegisterTimer("Person_Reset",   0, 'REOCAMV2_ResetMoveTimer($_IPS[\'TARGET\'], "Person");');
+        $this->RegisterTimer("Tier_Reset",     0, 'REOCAMV2_ResetMoveTimer($_IPS[\'TARGET\'], "Tier");');
+        $this->RegisterTimer("Fahrzeug_Reset", 0, 'REOCAMV2_ResetMoveTimer($_IPS[\'TARGET\'], "Fahrzeug");');
+        $this->RegisterTimer("Bewegung_Reset", 0, 'REOCAMV2_ResetMoveTimer($_IPS[\'TARGET\'], "Bewegung");');
+        $this->RegisterTimer("Test_Reset",     0, 'REOCAMV2_ResetMoveTimer($_IPS[\'TARGET\'], "Test");');
+        $this->RegisterTimer("Besucher_Reset", 0, 'REOCAMV2_ResetMoveTimer($_IPS[\'TARGET\'], "Besucher");');
+        $this->RegisterTimer("PollingTimer",      0, 'REOCAMV2_Polling($_IPS[\'TARGET\']);');
+        $this->RegisterTimer("ApiRequestTimer",   0, 'REOCAMV2_ExecuteApiRequests($_IPS[\'TARGET\'], false);');
+        $this->RegisterTimer("TokenRenewalTimer", 0, 'REOCAMV2_GetToken($_IPS[\'TARGET\']);');
+        $this->RegisterTimer("FirmwareCheckTimer", 0, 'REOCAMV2_FirmwareCheckTimer($_IPS[\'TARGET\']);');
 
     }
 
@@ -1902,15 +1902,15 @@ class Reolink extends IPSModuleStrict
     {
         // -------- IR (Infrared) --------
         if ($this->ReadPropertyBoolean("EnableApiIR")) {
-            if (!IPS_VariableProfileExists("REOCAM.IR")) {
-                IPS_CreateVariableProfile("REOCAM.IR", 1); 
+            if (!IPS_VariableProfileExists("REOCAMV2.IR")) {
+                IPS_CreateVariableProfile("REOCAMV2.IR", 1); 
             }
-            IPS_SetVariableProfileValues("REOCAM.IR", 0, 2, 0);
-            IPS_SetVariableProfileAssociation("REOCAM.IR", 0, "Aus",  "", -1);
-            IPS_SetVariableProfileAssociation("REOCAM.IR", 1, "An",   "", -1);
-            IPS_SetVariableProfileAssociation("REOCAM.IR", 2, "Auto", "", -1);
+            IPS_SetVariableProfileValues("REOCAMV2.IR", 0, 2, 0);
+            IPS_SetVariableProfileAssociation("REOCAMV2.IR", 0, "Aus",  "", -1);
+            IPS_SetVariableProfileAssociation("REOCAMV2.IR", 1, "An",   "", -1);
+            IPS_SetVariableProfileAssociation("REOCAMV2.IR", 2, "Auto", "", -1);
 
-            $this->RegisterVariableInteger("IRLights", "IR Beleuchtung", "REOCAM.IR", 0);
+            $this->RegisterVariableInteger("IRLights", "IR Beleuchtung", "REOCAMV2.IR", 0);
             $this->EnableAction("IRLights");
         } else {
             $this->UnregisterVariableIfExists("IRLights");
@@ -1918,18 +1918,18 @@ class Reolink extends IPSModuleStrict
 
         // -------- White LED --------
         if ($this->ReadPropertyBoolean("EnableApiWhiteLed")) {
-            if (!IPS_VariableProfileExists("REOCAM.WLED")) {
-                IPS_CreateVariableProfile("REOCAM.WLED", 1); 
+            if (!IPS_VariableProfileExists("REOCAMV2.WLED")) {
+                IPS_CreateVariableProfile("REOCAMV2.WLED", 1); 
             }
-            IPS_SetVariableProfileValues("REOCAM.WLED", 0, 2, 0);
-            IPS_SetVariableProfileAssociation("REOCAM.WLED", 0, "Aus", "", -1);
-            IPS_SetVariableProfileAssociation("REOCAM.WLED", 1, "Automatisch", "", -1);
-            IPS_SetVariableProfileAssociation("REOCAM.WLED", 2, "Zeitabhängig", "", -1);
+            IPS_SetVariableProfileValues("REOCAMV2.WLED", 0, 2, 0);
+            IPS_SetVariableProfileAssociation("REOCAMV2.WLED", 0, "Aus", "", -1);
+            IPS_SetVariableProfileAssociation("REOCAMV2.WLED", 1, "Automatisch", "", -1);
+            IPS_SetVariableProfileAssociation("REOCAMV2.WLED", 2, "Zeitabhängig", "", -1);
 
             $this->RegisterVariableBoolean("WhiteLed", "LED Status", "~Switch", 1);
             $this->EnableAction("WhiteLed");
 
-            $this->RegisterVariableInteger("Mode", "LED Modus", "REOCAM.WLED", 1);
+            $this->RegisterVariableInteger("Mode", "LED Modus", "REOCAMV2.WLED", 1);
             $this->EnableAction("Mode");
 
             $this->RegisterVariableInteger("Bright", "LED Helligkeit", "~Intensity.100", 1);
@@ -1942,32 +1942,32 @@ class Reolink extends IPSModuleStrict
 
         // -------- Email --------
         if ($this->ReadPropertyBoolean("EnableApiEmail")) {
-            if (!IPS_VariableProfileExists("REOCAM.EmailInterval")) {
-                IPS_CreateVariableProfile("REOCAM.EmailInterval", 1);
+            if (!IPS_VariableProfileExists("REOCAMV2.EmailInterval")) {
+                IPS_CreateVariableProfile("REOCAMV2.EmailInterval", 1);
             }
-            IPS_SetVariableProfileValues("REOCAM.EmailInterval", 30, 1800, 0);
-            IPS_SetVariableProfileAssociation("REOCAM.EmailInterval", 30,   "30 Sek.",    "", -1);
-            IPS_SetVariableProfileAssociation("REOCAM.EmailInterval", 60,   "1 Minute",   "", -1);
-            IPS_SetVariableProfileAssociation("REOCAM.EmailInterval", 300,  "5 Minuten",  "", -1);
-            IPS_SetVariableProfileAssociation("REOCAM.EmailInterval", 600,  "10 Minuten", "", -1);
-            IPS_SetVariableProfileAssociation("REOCAM.EmailInterval", 1800, "30 Minuten", "", -1);
+            IPS_SetVariableProfileValues("REOCAMV2.EmailInterval", 30, 1800, 0);
+            IPS_SetVariableProfileAssociation("REOCAMV2.EmailInterval", 30,   "30 Sek.",    "", -1);
+            IPS_SetVariableProfileAssociation("REOCAMV2.EmailInterval", 60,   "1 Minute",   "", -1);
+            IPS_SetVariableProfileAssociation("REOCAMV2.EmailInterval", 300,  "5 Minuten",  "", -1);
+            IPS_SetVariableProfileAssociation("REOCAMV2.EmailInterval", 600,  "10 Minuten", "", -1);
+            IPS_SetVariableProfileAssociation("REOCAMV2.EmailInterval", 1800, "30 Minuten", "", -1);
 
-            if (!IPS_VariableProfileExists("REOCAM.EmailContent")) {
-                IPS_CreateVariableProfile("REOCAM.EmailContent", 1);
+            if (!IPS_VariableProfileExists("REOCAMV2.EmailContent")) {
+                IPS_CreateVariableProfile("REOCAMV2.EmailContent", 1);
             }
-            IPS_SetVariableProfileValues("REOCAM.EmailContent", 0, 3, 0);
-            IPS_SetVariableProfileAssociation("REOCAM.EmailContent", 0, "Text",             "", -1);
-            IPS_SetVariableProfileAssociation("REOCAM.EmailContent", 1, "Bild (ohne Text)", "", -1);
-            IPS_SetVariableProfileAssociation("REOCAM.EmailContent", 2, "Text + Bild",      "", -1);
-            IPS_SetVariableProfileAssociation("REOCAM.EmailContent", 3, "Text + Video",     "", -1);
+            IPS_SetVariableProfileValues("REOCAMV2.EmailContent", 0, 3, 0);
+            IPS_SetVariableProfileAssociation("REOCAMV2.EmailContent", 0, "Text",             "", -1);
+            IPS_SetVariableProfileAssociation("REOCAMV2.EmailContent", 1, "Bild (ohne Text)", "", -1);
+            IPS_SetVariableProfileAssociation("REOCAMV2.EmailContent", 2, "Text + Bild",      "", -1);
+            IPS_SetVariableProfileAssociation("REOCAMV2.EmailContent", 3, "Text + Video",     "", -1);
 
             $this->RegisterVariableBoolean("EmailNotify", "E-Mail Alarm", "~Switch", 2);
             $this->EnableAction("EmailNotify");
 
-            $this->RegisterVariableInteger("EmailInterval", "E-Mail Intervall", "REOCAM.EmailInterval", 2);
+            $this->RegisterVariableInteger("EmailInterval", "E-Mail Intervall", "REOCAMV2.EmailInterval", 2);
             $this->EnableAction("EmailInterval");
 
-            $this->RegisterVariableInteger("EmailContent", "E-Mail Inhalt", "REOCAM.EmailContent", 2);
+            $this->RegisterVariableInteger("EmailContent", "E-Mail Inhalt", "REOCAMV2.EmailContent", 2);
             $this->EnableAction("EmailContent");
         } else {
             $this->UnregisterVariableIfExists("EmailNotify");
@@ -1993,29 +1993,29 @@ class Reolink extends IPSModuleStrict
 
         // -------- Bewegungssensitivität (1..50) + AI-Sensitivität (0..100) --------
         if ($this->ReadPropertyBoolean("EnableApiSensitivity")) {
-            if (!IPS_VariableProfileExists("REOCAM.Sensitivity50")) {
-                IPS_CreateVariableProfile("REOCAM.Sensitivity50", 1); // Integer
+            if (!IPS_VariableProfileExists("REOCAMV2.Sensitivity50")) {
+                IPS_CreateVariableProfile("REOCAMV2.Sensitivity50", 1); // Integer
             }
-            IPS_SetVariableProfileValues("REOCAM.Sensitivity50", 1, 50, 1);
+            IPS_SetVariableProfileValues("REOCAMV2.Sensitivity50", 1, 50, 1);
 
-            if (!IPS_VariableProfileExists("REOCAM.AiSensitivity100")) {
-                IPS_CreateVariableProfile("REOCAM.AiSensitivity100", 1); // Integer
+            if (!IPS_VariableProfileExists("REOCAMV2.AiSensitivity100")) {
+                IPS_CreateVariableProfile("REOCAMV2.AiSensitivity100", 1); // Integer
             }
-            IPS_SetVariableProfileValues("REOCAM.AiSensitivity100", 0, 100, 1);
+            IPS_SetVariableProfileValues("REOCAMV2.AiSensitivity100", 0, 100, 1);
 
             $this->RegisterVariableBoolean("MdDetectionArea", "MD Bewegungserkennung", "~Switch", 4);
             $this->EnableAction("MdDetectionArea");
 
-            $this->RegisterVariableInteger("MdSensitivity", "MD Sensitivität", "REOCAM.Sensitivity50", 4);
+            $this->RegisterVariableInteger("MdSensitivity", "MD Sensitivität", "REOCAMV2.Sensitivity50", 4);
             $this->EnableAction("MdSensitivity");
 
-            $this->RegisterVariableInteger("AiSensitivityPerson", "AI Sensitivität Person", "REOCAM.AiSensitivity100", 4);
+            $this->RegisterVariableInteger("AiSensitivityPerson", "AI Sensitivität Person", "REOCAMV2.AiSensitivity100", 4);
             $this->EnableAction("AiSensitivityPerson");
 
-            $this->RegisterVariableInteger("AiSensitivityVehicle", "AI Sensitivität Fahrzeug", "REOCAM.AiSensitivity100", 4);
+            $this->RegisterVariableInteger("AiSensitivityVehicle", "AI Sensitivität Fahrzeug", "REOCAMV2.AiSensitivity100", 4);
             $this->EnableAction("AiSensitivityVehicle");
 
-            $this->RegisterVariableInteger("AiSensitivityAnimal", "AI Sensitivität Tier", "REOCAM.AiSensitivity100", 4);
+            $this->RegisterVariableInteger("AiSensitivityAnimal", "AI Sensitivität Tier", "REOCAMV2.AiSensitivity100", 4);
             $this->EnableAction("AiSensitivityAnimal");
         } else {
             $this->UnregisterVariableIfExists("MdDetectionArea");
@@ -2030,19 +2030,19 @@ class Reolink extends IPSModuleStrict
             $this->RegisterVariableBoolean("SirenEnabled", "Sirene", "~Switch", 6);
             $this->EnableAction("SirenEnabled");
 
-            if (!IPS_VariableProfileExists("REOCAM.SirenAction")) {
-                IPS_CreateVariableProfile("REOCAM.SirenAction", 1); // Integer
+            if (!IPS_VariableProfileExists("REOCAMV2.SirenAction")) {
+                IPS_CreateVariableProfile("REOCAMV2.SirenAction", 1); // Integer
                 }
-                IPS_SetVariableProfileValues("REOCAM.SirenAction", 0, 100, 0);
-                IPS_SetVariableProfileAssociation("REOCAM.SirenAction", 100, "Start (manuell)", "", -1);
-                IPS_SetVariableProfileAssociation("REOCAM.SirenAction", 0,   "Stop",            "", -1);
-                IPS_SetVariableProfileAssociation("REOCAM.SirenAction", 1,   "1× abspielen",    "", -1);
-                IPS_SetVariableProfileAssociation("REOCAM.SirenAction", 2,   "2× abspielen",    "", -1);
-                IPS_SetVariableProfileAssociation("REOCAM.SirenAction", 3,   "3× abspielen",    "", -1);
-                IPS_SetVariableProfileAssociation("REOCAM.SirenAction", 4,   "4× abspielen",    "", -1);
-                IPS_SetVariableProfileAssociation("REOCAM.SirenAction", 5,   "5× abspielen",    "", -1);
+                IPS_SetVariableProfileValues("REOCAMV2.SirenAction", 0, 100, 0);
+                IPS_SetVariableProfileAssociation("REOCAMV2.SirenAction", 100, "Start (manuell)", "", -1);
+                IPS_SetVariableProfileAssociation("REOCAMV2.SirenAction", 0,   "Stop",            "", -1);
+                IPS_SetVariableProfileAssociation("REOCAMV2.SirenAction", 1,   "1× abspielen",    "", -1);
+                IPS_SetVariableProfileAssociation("REOCAMV2.SirenAction", 2,   "2× abspielen",    "", -1);
+                IPS_SetVariableProfileAssociation("REOCAMV2.SirenAction", 3,   "3× abspielen",    "", -1);
+                IPS_SetVariableProfileAssociation("REOCAMV2.SirenAction", 4,   "4× abspielen",    "", -1);
+                IPS_SetVariableProfileAssociation("REOCAMV2.SirenAction", 5,   "5× abspielen",    "", -1);
             
-            $this->RegisterVariableInteger("SirenAction", "Sirenenaktion", "REOCAM.SirenAction", 6);
+            $this->RegisterVariableInteger("SirenAction", "Sirenenaktion", "REOCAMV2.SirenAction", 6);
             $this->EnableAction("SirenAction");
 
         } else {
@@ -2130,7 +2130,7 @@ class Reolink extends IPSModuleStrict
             return;
         }
 
-        $semName = "REOCAM_{$this->InstanceID}_GetToken";
+        $semName = "REOCAMV2_{$this->InstanceID}_GetToken";
         $entered = function_exists('IPS_SemaphoreEnter') ? IPS_SemaphoreEnter($semName, 5000) : true;
         if (!$entered) {
             $this->dbg('TOKEN', 'Übersprungen: anderer Login aktiv');
@@ -2250,7 +2250,7 @@ class Reolink extends IPSModuleStrict
             return;
         }
 
-        $sem = "REOCAM_{$this->InstanceID}_Exec";
+        $sem = "REOCAMV2_{$this->InstanceID}_Exec";
         if (function_exists('IPS_SemaphoreEnter')) {
             if (!IPS_SemaphoreEnter($sem, 2000)) {
                 return;

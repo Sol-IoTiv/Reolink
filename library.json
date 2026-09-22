@@ -1,12 +1,12 @@
 {
-    "id": "{37A9DF25-CC0D-6EAB-1E0A-18EEB0D09E99}",
-    "name": "Reolink",
-    "author": "Stefan Künzli",
-    "url": "https://github.com/mb-stern/Reolink",
+    "id": "{8409319D-3485-4C3A-9142-F9C893AE4AA8}",
+    "name": "Reolink V2 (Test)",
+    "author": "Stefan Künzli; Test-Erweiterung Sol-IoTiv",
+    "url": "https://github.com/Sol-IoTiv/Reolink",
     "compatibility": {
         "version": "8.2"
     },
-    "version": "3.0",
-    "build": 0,
+    "version": "0.1",
+    "build": 1,
     "date": 0
 }

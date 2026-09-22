@@ -1,7 +1,7 @@
 <?php
 
 /** Additional light automation; the camera's existing reset timers are untouched. */
-trait ReolinkMotionLighting
+trait ReolinkV2MotionLighting
 {
     private function CreateMotionLighting(): void
     {
@@ -14,7 +14,7 @@ trait ReolinkMotionLighting
         $this->RegisterAttributeInteger('MotionLightOwnedTarget', 0);
         $this->RegisterAttributeInteger('MotionLightLastDetection', 0);
         $this->RegisterAttributeString('MotionLightReferences', '[]');
-        $this->RegisterTimer('MotionLightTimer', 0, 'REOCAM_MotionLightTimer($_IPS[\'TARGET\']);');
+        $this->RegisterTimer('MotionLightTimer', 0, 'REOCAMV2_MotionLightTimer($_IPS[\'TARGET\']);');
         $this->RegisterMessage(0, IPS_KERNELMESSAGE);
     }
 

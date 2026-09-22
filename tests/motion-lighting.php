@@ -45,11 +45,11 @@ class IPSModuleStrict {
     public function SetValue($ident, $value) { $GLOBALS['variables'][$this->idents[$ident]]['value'] = $value; }
     public function SendDebug($topic, $message, $format) { $this->debug[] = $message; }
 }
-require __DIR__ . '/../REOCAM/module.php';
-function invoke(Reolink $m, string $name, ...$args): mixed {
+require __DIR__ . '/../REOCAMV2/module.php';
+function invoke(ReolinkV2 $m, string $name, ...$args): mixed {
     return (new ReflectionMethod($m, $name))->invoke($m, ...$args);
 }
-function fixture(): Reolink {
+function fixture(): ReolinkV2 {
     $GLOBALS['actions'] = [];
     $GLOBALS['failAction'] = false;
     $GLOBALS['variables'] = [];
@@ -57,7 +57,7 @@ function fixture(): Reolink {
         $GLOBALS['variables'][$id] = ['VariableType' => 0, 'VariableAction' => $id === 4 || $id === 7 ? 99 : 0, 'VariableCustomAction' => 0, 'value' => false];
     }
     $GLOBALS['variables'][5] = ['VariableType' => 2, 'value' => 10.0];
-    $m = new Reolink();
+    $m = new ReolinkV2();
     invoke($m, 'CreateMotionLighting');
     $m->props = array_merge($m->props, ['MotionLightEnabled' => true, 'MotionLightPerson' => 1,
         'MotionLightAnimal' => 2, 'MotionLightVehicle' => 3, 'MotionLightTarget' => 4, 'MotionLightBrightness' => 5]);
