@@ -44,3 +44,8 @@ php tests/motion-lighting.php
 Die Tests simulieren Symcon-Funktionen. Sie ersetzen keinen Test mit Symcon und Kamera.
 
 Nach erfolgreichem Test soll ausschließlich die Bewegungsmelder-Erweiterung gegen das Originalprojekt vorgeschlagen werden. Die V2-Umbenennungen gehören nicht in diesen späteren Pull Request. Es wurde noch kein Pull Request an mb-stern erstellt.
+
+
+## Statusanzeige
+
+Die Boolean-Variable **Bewegungsmelder aktiv** ist eine reine Anzeige ohne Schaltaktion. Sie ist An, wenn der Hauptschalter und mindestens eine Erkennungsart eingeschaltet sind. Sie zeigt die gespeicherte Auswahl nach Änderungen übernehmen; keine Bewegung, keinen Lichtzustand und keine Prüfung der Betriebsbereitschaft. 81 automatisierte Prüfungen mit simulierten Symcon-Funktionen bestanden, einschließlich aller Schalterkombinationen.
