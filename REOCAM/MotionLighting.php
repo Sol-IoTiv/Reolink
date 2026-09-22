@@ -33,7 +33,7 @@ trait ReolinkMotionLighting
                 ['type' => 'SelectVariable', 'name' => 'MotionLightTarget', 'caption' => 'Schaltvariable (Boolean mit Aktion)'],
                 ['type' => 'RowLayout', 'items' => [
                     ['type' => 'SelectVariable', 'name' => 'MotionLightBrightness', 'caption' => 'Helligkeitsvariable (lux)'],
-                    ['type' => 'NumberSpinner', 'name' => 'MotionLightThreshold', 'caption' => 'Einschalten unter Schwellwert', 'digits' => 2, 'suffix' => ' lux'],
+                    ['type' => 'NumberSpinner', 'name' => 'MotionLightThreshold', 'caption' => 'Einschalten unter Schwellwert', 'digits' => 0, 'suffix' => ' lux'],
                 ]],
                 ['type' => 'NumberSpinner', 'name' => 'MotionLightDelay', 'caption' => 'Nachlaufzeit ab letzter Erkennung', 'suffix' => ' Sekunden', 'minimum' => 1, 'maximum' => 86400],
                 ['type' => 'Label', 'caption' => 'Erkennungsarten beliebig kombinieren. Die eigenen Kamera-Variablen werden automatisch verwendet. Helligkeitsvariable und Schwellwert müssen Werte in lux verwenden.'],
