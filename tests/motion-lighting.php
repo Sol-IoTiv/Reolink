@@ -59,8 +59,8 @@ function fixture(): ReolinkV2 {
     $GLOBALS['variables'][5] = ['VariableType' => 2, 'value' => 10.0];
     $m = new ReolinkV2();
     invoke($m, 'CreateMotionLighting');
-    $m->props = array_merge($m->props, ['MotionLightEnabled' => true, 'MotionLightPerson' => 1,
-        'MotionLightAnimal' => 2, 'MotionLightVehicle' => 3, 'MotionLightTarget' => 4, 'MotionLightBrightness' => 5]);
+    $m->props = array_merge($m->props, ['MotionLightEnabled' => true, 'MotionLightUsePerson' => true,
+        'MotionLightUseAnimal' => true, 'MotionLightUseVehicle' => true, 'MotionLightTarget' => 4, 'MotionLightBrightness' => 5]);
     invoke($m, 'ApplyMotionLighting');
     return $m;
 }
@@ -105,18 +105,23 @@ $before = $m->attrs['MotionLightLastDetection'];
 invoke($m, 'PollingUpdateState', 'people', 0);
 check($m->attrs['MotionLightLastDetection'] === $before, 'Negatives Polling verlängert nicht');
 
+// All eight combinations: any enabled category can trigger independently.
+for ($mask = 0; $mask < 8; $mask++) {
+    foreach (['Person', 'Tier', 'Fahrzeug'] as $bit => $ident) {
+        $m = fixture();
+        foreach (['Person', 'Animal', 'Vehicle'] as $i => $name) {
+            $m->props['MotionLightUse' . $name] = (bool)($mask & (1 << $i));
+        }
+        invoke($m, 'MotionLightingCameraDetection', $ident);
+        check((count($actions) === 1) === (bool)($mask & (1 << $bit)), 'Kombination ' . $mask . ': ' . $ident);
+    }
+}
 $m = fixture();
-$m->props['MotionLightPerson'] = 6;
+$m->props['MotionLightUseAnimal'] = false;
 invoke($m, 'ApplyMotionLighting');
-check(!isset($m->messages['1:' . VM_UPDATE]) && isset($m->messages['6:' . VM_UPDATE]), 'Quellenwechsel entfernt alte Anmeldung');
+check(invoke($m, 'MotionLightingSources') === [1, 3], 'Mensch und Fahrzeug automatisch gefunden, Tier aus');
 $m->MessageSink(1, 6, VM_UPDATE, [true, false]);
-check($actions === [[4, true]], 'Externe Boolean-Aktualisierung ohne Wertänderung löst aus');
-$m->attrs['MotionLightLastDetection'] = time() - 50;
-$m->MessageSink(2, 6, VM_UPDATE, [true, false]);
-check($m->attrs['MotionLightLastDetection'] >= time() - 1, 'Wiederholtes externes true verlängert');
-$before = $m->attrs['MotionLightLastDetection'];
-$m->MessageSink(3, 6, VM_UPDATE, [false, true]);
-check($before === $m->attrs['MotionLightLastDetection'], 'Externes false verlängert nicht');
+check(!$actions, 'Fremde Variablen werden ignoriert');
 
 $m = fixture();
 $m->props['MotionLightEnabled'] = false;
@@ -149,7 +154,8 @@ unset($variables[5]);
 invoke($m, 'MotionLightingCameraDetection', 'Person');
 check(!$actions, 'Fehlender Helligkeitssensor verhindert Einschalten');
 $m = fixture();
-$m->props['MotionLightPerson'] = 4;
+$m->props['MotionLightTarget'] = 1;
+$variables[1]['VariableAction'] = 99;
 check(invoke($m, 'MotionLightingError') !== null, 'Rückkopplung zwischen Quelle und Ziel abgelehnt');
 
 $m = fixture();
