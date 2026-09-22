@@ -44,6 +44,11 @@ class IPSModuleStrict {
     public function GetIDForIdent($ident) { return $this->idents[$ident] ?? false; }
     public function SetValue($ident, $value) { $GLOBALS['variables'][$this->idents[$ident]]['value'] = $value; }
     public function SendDebug($topic, $message, $format) { $this->debug[] = $message; }
+    public function RegisterVariableBoolean($ident, $name, $profile, $position) {
+        $this->idents[$ident] = 8;
+        $GLOBALS['variables'][8] ??= ['VariableType' => 0, 'VariableAction' => 0, 'value' => false];
+    }
+    public function DisableAction($ident) { $GLOBALS['variables'][$this->idents[$ident]]['VariableAction'] = 0; }
 }
 require __DIR__ . '/../REOCAM/module.php';
 function invoke(Reolink $m, string $name, ...$args): mixed {
@@ -187,4 +192,16 @@ $m->props['MotionLightDelay'] = 5;
 invoke($m, 'ApplyMotionLighting');
 check(GetValue(4) === false, 'Geänderte Nachlaufzeit bezieht sich auf letzte Erkennung');
 
+foreach ([false, true] as $enabled) {
+    for ($mask = 0; $mask < 8; $mask++) {
+        $m = fixture();
+        $m->props['MotionLightEnabled'] = $enabled;
+        foreach (['Person', 'Animal', 'Vehicle'] as $i => $name) {
+            $m->props['MotionLightUse' . $name] = (bool)($mask & (1 << $i));
+        }
+        invoke($m, 'ApplyMotionLighting');
+        check(GetValue(8) === ($enabled && $mask !== 0), 'Status Hauptschalter ' . (int)$enabled . ', Kombination ' . $mask);
+        check(IPS_GetVariable(8)['VariableAction'] === 0, 'Status ohne Schaltaktion');
+    }
+}
 echo $count . ' checks passed.' . PHP_EOL;

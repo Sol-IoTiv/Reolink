@@ -55,3 +55,8 @@ php tests/motion-lighting.php
 ```
 
 Ein Live-Test mit Symcon und Kamera steht aus. Dafür zunächst eine Test-Schaltvariable mit Aktion verwenden: Nachlaufzeit kurz einstellen, Erkennung mehrfach auslösen, Ausschaltung ab letzter Erkennung prüfen und anschließend Helligkeit oberhalb des Schwellwerts testen.
+
+
+## Statusanzeige
+
+Die Boolean-Variable **Bewegungsmelder aktiv** ist eine reine Anzeige ohne Schaltaktion. Sie ist An, wenn der Hauptschalter und mindestens eine Erkennungsart eingeschaltet sind. Sie zeigt die gespeicherte Auswahl nach Änderungen übernehmen; keine Bewegung, keinen Lichtzustand und keine Prüfung der Betriebsbereitschaft. 81 automatisierte Prüfungen mit simulierten Symcon-Funktionen bestanden, einschließlich aller Schalterkombinationen.

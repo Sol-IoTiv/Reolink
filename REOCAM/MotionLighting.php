@@ -86,6 +86,14 @@ trait ReolinkMotionLighting
 
     private function ApplyMotionLighting(): void
     {
+        // Read-only configuration status: not motion, light state or readiness.
+        $this->RegisterVariableBoolean('MotionLightActive', 'Bewegungsmelder aktiv', '~Switch', 19);
+        $this->DisableAction('MotionLightActive');
+        $this->SetValue('MotionLightActive', $this->ReadPropertyBoolean('MotionLightEnabled') && (
+            $this->ReadPropertyBoolean('MotionLightUsePerson')
+            || $this->ReadPropertyBoolean('MotionLightUseAnimal')
+            || $this->ReadPropertyBoolean('MotionLightUseVehicle')
+        ));
         foreach (json_decode($this->ReadAttributeString('MotionLightReferences'), true) ?: [] as $id) {
             $this->UnregisterMessage($id, VM_UPDATE);
             $this->UnregisterReference($id);
