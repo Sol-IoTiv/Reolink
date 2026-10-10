@@ -8,7 +8,7 @@ $actions = [];
 $failAction = false;
 function IPS_VariableExists(int $id): bool { return isset($GLOBALS['variables'][$id]); }
 function IPS_GetVariable(int $id): array { return $GLOBALS['variables'][$id]; }
-function GetValue(int $id): mixed { return $GLOBALS['variables'][$id]['value']; }
+function GetValue(int $id): mixed { if (!isset($GLOBALS['variables'][$id])) throw new RuntimeException('Unknown variable: ' . $id); return $GLOBALS['variables'][$id]['value']; }
 function IPS_GetKernelRunlevel(): int { return KR_READY; }
 function IPS_SemaphoreEnter(string $name, int $timeout): bool { return true; }
 function IPS_SemaphoreLeave(string $name): void {}
@@ -218,4 +218,36 @@ foreach ([false, true] as $enabled) {
         check(IPS_GetVariable(8)['VariableAction'] === 0, 'Status ohne Schaltaktion');
     }
 }
+
+$m = fixture();
+$m->props['MotionLightBrightness'] = 0;
+$m->props['MotionLightThreshold'] = NAN; // Unused without a sensor.
+invoke($m, 'ApplyMotionLighting');
+check(invoke($m, 'MotionLightingError') === null, 'Ohne Sensor ist die Konfiguration gültig');
+check(!isset($m->references[0]) && !isset($m->references[5]), 'Kein Sensor wird referenziert');
+invoke($m, 'MotionLightingCameraDetection', 'Person');
+check($actions === [[4, true]], 'Ohne Sensor wird eingeschaltet');
+$m->attrs['MotionLightLastDetection'] = time() - 100;
+invoke($m, 'MotionLightingCameraDetection', 'Fahrzeug');
+check($m->attrs['MotionLightLastDetection'] >= time() - 1 && count($actions) === 1, 'Ohne Sensor wird die Nachlaufzeit verlängert');
+$m->attrs['MotionLightLastDetection'] = time() - 120;
+$m->MotionLightTimer();
+check($actions === [[4, true], [4, false]], 'Ohne Sensor wird nach Ablauf ausgeschaltet');
+
+$m = fixture();
+invoke($m, 'MotionLightingCameraDetection', 'Person');
+$m->props['MotionLightBrightness'] = 0;
+invoke($m, 'ApplyMotionLighting');
+check(GetValue(4) === true, 'Abwahl des Sensors beendet laufende Nachlaufzeit nicht');
+$m->attrs['MotionLightLastDetection'] = time() - 100;
+invoke($m, 'MotionLightingCameraDetection', 'Person');
+check($m->attrs['MotionLightLastDetection'] >= time() - 1, 'Nach Sensorabwahl wird verlängert');
+
+foreach ([999, 6] as $sensor) {
+    $m = fixture();
+    $m->props['MotionLightBrightness'] = $sensor;
+    invoke($m, 'MotionLightingCameraDetection', 'Person');
+    check(!$actions && invoke($m, 'MotionLightingError') !== null, 'Ungültiger ausgewählter Sensor bleibt Fehler: ' . $sensor);
+}
+
 echo $count . ' checks passed.' . PHP_EOL;
