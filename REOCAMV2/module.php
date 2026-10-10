@@ -630,9 +630,10 @@ class ReolinkV2 extends IPSModuleStrict
                             'type'  => 'ColumnLayout',
                             'items' => [
                                 [
-                                    // No property binding: edits here never change the generated webhook.
+                                    // Display only: no property binding and no user input.
                                     'type'    => 'ValidationTextBox',
-                                    'caption' => 'Webhook-Pfad (Strg+A, Strg+C zum Kopieren)',
+                                    'caption' => 'Webhook-Pfad',
+                                    'enabled' => false,
                                     'value'   => $webhookFull,
                                     'width'   => '500px'
                                 ],

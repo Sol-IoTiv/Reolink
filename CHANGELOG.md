@@ -5,5 +5,4 @@
 - Helligkeitsvariable optional: Bei „Kein(e)“ schalten passende Erkennungen unabhängig von der Helligkeit ein und verlängern die Nachlaufzeit. Der Lux-Schwellwert wird ignoriert.
 - Mit ausgewähltem Sensor bleibt die Lux-Prüfung für Einschalten und Verlängern erhalten. Ungültige ausgewählte Sensoren bleiben Konfigurationsfehler.
 - Formularhinweise, Dokumentation und Regressionstests ergänzt.
-- Webhook-URL als aktives Textfeld statt anklickbarem Label anzeigen, damit sie direkt mit Strg+A und Strg+C kopiert werden kann.
-- Das Feld ist nicht an eine Moduleigenschaft gebunden; Änderungen im Feld verändern den automatisch erzeugten Webhook nicht. Beim erneuten Öffnen erscheint wieder die erzeugte URL.
+- Webhook-URL als gesperrtes Anzeigefeld ohne Moduleigenschaft darstellen. Manuelle Eingaben und dadurch ausgelöste ungespeicherte Änderungen werden verhindert. Das Markieren/Kopieren im gesperrten Feld hängt von der Konsole ab und ist noch nicht bestätigt.
