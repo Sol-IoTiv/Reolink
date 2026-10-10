@@ -630,9 +630,11 @@ class ReolinkV2 extends IPSModuleStrict
                             'type'  => 'ColumnLayout',
                             'items' => [
                                 [
-                                    'type'    => 'Label',
-                                    'name'    => 'WebhookFull',
-                                    'caption' => 'Webhook-Pfad: ' . $webhookFull
+                                    // No property binding: edits here never change the generated webhook.
+                                    'type'    => 'ValidationTextBox',
+                                    'caption' => 'Webhook-Pfad (Strg+A, Strg+C zum Kopieren)',
+                                    'value'   => $webhookFull,
+                                    'width'   => '500px'
                                 ],
                                 [
                                     'type'    => 'CheckBox',
