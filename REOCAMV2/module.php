@@ -630,12 +630,9 @@ class ReolinkV2 extends IPSModuleStrict
                             'type'  => 'ColumnLayout',
                             'items' => [
                                 [
-                                    // Display only: no property binding and no user input.
-                                    'type'    => 'ValidationTextBox',
-                                    'caption' => 'Webhook-Pfad',
-                                    'enabled' => false,
-                                    'value'   => $webhookFull,
-                                    'width'   => '500px'
+                                    'type'    => 'Label',
+                                    'name'    => 'WebhookFull',
+                                    'caption' => 'Webhook-Pfad: ' . $webhookFull
                                 ],
                                 [
                                     'type'    => 'CheckBox',
